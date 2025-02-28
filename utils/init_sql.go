@@ -11,6 +11,7 @@ func InitSql() {
 	db, err := sql.Open("sqlite3", "db/pages.db")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 	defer db.Close()
 	createTable := `CREATE TABLE IF NOT EXISTS pages (
