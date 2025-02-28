@@ -13,6 +13,7 @@ func main() {
 
 	r.GET("/api/list", routers.List)
 	r.POST("/api/add", routers.AddItem)
+	r.DELETE("/api/del/:id", routers.DeleteItem)
 
 	r.Run(":8080")
 }

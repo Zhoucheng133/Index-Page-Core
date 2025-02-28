@@ -105,3 +105,26 @@ func AddItem(c *gin.Context) {
 
 	c.JSON(200, gin.H{"ok": true, "data": "数据插入成功"})
 }
+
+func DeleteItem(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(400, gin.H{"ok": false, "data": "缺少 ID 参数"})
+		return
+	}
+	db, err := sql.Open("sqlite3", "db/pages.db")
+	if err != nil {
+		c.JSON(500, gin.H{"ok": false, "data": "数据库连接失败"})
+		return
+	}
+	defer db.Close()
+
+	query := `DELETE FROM pages WHERE id = ?`
+	_, err = db.Exec(query, id)
+	if err != nil {
+		c.JSON(500, gin.H{"ok": false, "data": "删除数据失败", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"ok": true, "data": "数据删除成功"})
+}
