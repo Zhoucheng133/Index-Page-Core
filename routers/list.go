@@ -10,7 +10,7 @@ import (
 )
 
 type Page struct {
-	ID    int    `json:"id"`
+	ID    int    `json:"id,omitempty"`
 	Name  string `json:"name"`
 	Port  string `json:"port"`
 	WebUI int    `json:"webui"`
@@ -82,4 +82,26 @@ func List(c *gin.Context) {
 			"data": pages,
 		},
 	)
+}
+
+func AddItem(c *gin.Context) {
+	var newPage Page
+	if err := c.ShouldBindJSON(&newPage); err != nil {
+		c.JSON(400, gin.H{"ok": false, "data": "请求数据格式不正确"})
+		return
+	}
+	db, err := sql.Open("sqlite3", "db/pages.db")
+	if err != nil {
+		c.JSON(500, gin.H{"ok": false, "data": "数据库连接失败"})
+		return
+	}
+	defer db.Close()
+	query := `INSERT INTO pages (name, port, webui, tip) VALUES (?, ?, ?, ?)`
+	_, err = db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
+	if err != nil {
+		c.JSON(500, gin.H{"ok": false, "data": "插入数据失败", "error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"ok": true, "data": "数据插入成功"})
 }

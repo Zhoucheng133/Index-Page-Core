@@ -12,6 +12,7 @@ func main() {
 	r := gin.New()
 
 	r.GET("/api/list", routers.List)
+	r.POST("/api/add", routers.AddItem)
 
 	r.Run(":8080")
 }
