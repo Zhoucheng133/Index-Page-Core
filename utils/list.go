@@ -18,6 +18,15 @@ type Page struct {
 }
 
 func List(c *gin.Context) {
+	username := c.GetHeader("username")
+	password := c.GetHeader("password")
+	if len(username) == 0 || len(password) == 0 {
+		c.JSON(401, gin.H{"ok": false, "msg": "缺少请求头"})
+		return
+	} else if !AuthCheck(username, password) {
+		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+		return
+	}
 	rows, err := db.Query("SELECT id, name, port, webui, tip FROM pages")
 	if err != nil {
 		c.JSON(
@@ -73,6 +82,15 @@ func List(c *gin.Context) {
 }
 
 func AddItem(c *gin.Context) {
+	username := c.GetHeader("username")
+	password := c.GetHeader("password")
+	if len(username) == 0 || len(password) == 0 {
+		c.JSON(401, gin.H{"ok": false, "msg": "缺少请求头"})
+		return
+	} else if !AuthCheck(username, password) {
+		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+		return
+	}
 	var newPage Page
 	if err := c.ShouldBindJSON(&newPage); err != nil {
 		c.JSON(400, gin.H{"ok": false, "data": "请求数据格式不正确"})
@@ -88,6 +106,15 @@ func AddItem(c *gin.Context) {
 }
 
 func DeleteItem(c *gin.Context) {
+	username := c.GetHeader("username")
+	password := c.GetHeader("password")
+	if len(username) == 0 || len(password) == 0 {
+		c.JSON(401, gin.H{"ok": false, "msg": "缺少请求头"})
+		return
+	} else if !AuthCheck(username, password) {
+		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+		return
+	}
 	id := c.Param("id")
 
 	if id == "" {
