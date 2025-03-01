@@ -7,13 +7,15 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var db *sql.DB
+
 func InitSql() {
-	db, err := sql.Open("sqlite3", "db/pages.db")
+	var err error
+	db, err = sql.Open("sqlite3", "db/database.db")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	defer db.Close()
 	createPage := `CREATE TABLE IF NOT EXISTS pages (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT,
@@ -28,7 +30,7 @@ func InitSql() {
 	createUser := `CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT,
-		password TEXT,
+		password TEXT
 	);`
 	_, err = db.Exec(createUser)
 	if err != nil {

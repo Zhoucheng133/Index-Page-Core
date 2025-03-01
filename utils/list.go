@@ -1,4 +1,4 @@
-package routers
+package utils
 
 import (
 	"database/sql"
@@ -18,18 +18,6 @@ type Page struct {
 }
 
 func List(c *gin.Context) {
-	db, err := sql.Open("sqlite3", "db/pages.db")
-	if err != nil {
-		c.JSON(
-			400,
-			gin.H{
-				"ok":   false,
-				"data": err,
-			},
-		)
-		return
-	}
-	defer db.Close()
 	rows, err := db.Query("SELECT id, name, port, webui, tip FROM pages")
 	if err != nil {
 		c.JSON(
@@ -41,7 +29,6 @@ func List(c *gin.Context) {
 		)
 		return
 	}
-	defer rows.Close()
 	var pages []Page
 	for rows.Next() {
 		var p Page
@@ -90,14 +77,8 @@ func AddItem(c *gin.Context) {
 		c.JSON(400, gin.H{"ok": false, "data": "请求数据格式不正确"})
 		return
 	}
-	db, err := sql.Open("sqlite3", "db/pages.db")
-	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "data": "数据库连接失败"})
-		return
-	}
-	defer db.Close()
 	query := `INSERT INTO pages (name, port, webui, tip) VALUES (?, ?, ?, ?)`
-	_, err = db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
+	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
 	if err != nil {
 		c.JSON(500, gin.H{"ok": false, "data": "插入数据失败", "error": err.Error()})
 		return
@@ -113,15 +94,9 @@ func DeleteItem(c *gin.Context) {
 		c.JSON(400, gin.H{"ok": false, "data": "缺少 ID 参数"})
 		return
 	}
-	db, err := sql.Open("sqlite3", "db/pages.db")
-	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "data": "数据库连接失败"})
-		return
-	}
-	defer db.Close()
 
 	query := `DELETE FROM pages WHERE id = ?`
-	_, err = db.Exec(query, id)
+	_, err := db.Exec(query, id)
 	if err != nil {
 		c.JSON(500, gin.H{"ok": false, "data": "删除数据失败", "error": err.Error()})
 		return
