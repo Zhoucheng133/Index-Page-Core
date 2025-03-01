@@ -89,33 +89,27 @@ func Register(c *gin.Context) {
 	c.JSON(200, gin.H{"ok": true, "data": "注册成功"})
 }
 
-func AuthCheck(username string, password string, c *gin.Context) {
+func AuthCheck(username string, password string) bool {
 	rows, err := db.Query("SELECT id, name, password, salt FROM users WHERE name= ? ", username)
 	if err != nil {
-		c.JSON(
-			400,
-			gin.H{
-				"ok":   false,
-				"data": err,
-			},
-		)
-		return
+		return false
 	}
 	var userData User
 	if rows.Next() {
 		if err := rows.Scan(&userData.ID, &userData.Name, &userData.Password, &userData.Salt); err != nil {
-			c.JSON(500, gin.H{"ok": false, "data": err.Error()})
-			return
+			defer rows.Close()
+			return false
 		} else if savePassword(password, userData.Salt) == userData.Password {
-			c.JSON(200, gin.H{"ok": true, "data": ""})
+			defer rows.Close()
+			return true
 		} else {
-			c.JSON(401, gin.H{"ok": false, "data": "用户名或者密码错误"})
-			return
+			defer rows.Close()
+			return false
 		}
 	} else {
-		c.JSON(404, gin.H{"ok": false, "data": "User not found"})
+		defer rows.Close()
+		return false
 	}
-	defer rows.Close()
 }
 
 func Login(c *gin.Context) {
@@ -124,5 +118,9 @@ func Login(c *gin.Context) {
 		c.JSON(400, gin.H{"ok": false, "data": "请求数据格式不正确"})
 		return
 	}
-	AuthCheck(user.Name, user.Password, c)
+	if AuthCheck(user.Name, user.Password) {
+		c.JSON(200, gin.H{"ok": true, "msg": ""})
+	} else {
+		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+	}
 }
