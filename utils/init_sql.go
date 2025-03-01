@@ -30,7 +30,8 @@ func InitSql() {
 	createUser := `CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT,
-		password TEXT
+		password TEXT,
+		salt TEXT
 	);`
 	_, err = db.Exec(createUser)
 	if err != nil {

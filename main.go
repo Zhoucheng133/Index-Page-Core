@@ -18,6 +18,8 @@ func main() {
 	r.DELETE("/api/del/:id", utils.DeleteItem)
 
 	r.GET("/api/init", utils.Init)
+	r.POST("/api/register", utils.Register)
+	r.POST("/api/login", utils.Login)
 
 	r.Run(":8080")
 }

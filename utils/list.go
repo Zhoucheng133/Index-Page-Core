@@ -52,6 +52,7 @@ func List(c *gin.Context) {
 		}
 		pages = append(pages, p)
 	}
+	defer rows.Close()
 	if err = rows.Err(); err != nil {
 		c.JSON(
 			400,
@@ -83,7 +84,6 @@ func AddItem(c *gin.Context) {
 		c.JSON(500, gin.H{"ok": false, "data": "插入数据失败", "error": err.Error()})
 		return
 	}
-
 	c.JSON(200, gin.H{"ok": true, "data": "数据插入成功"})
 }
 
