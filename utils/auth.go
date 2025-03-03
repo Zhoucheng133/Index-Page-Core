@@ -25,10 +25,7 @@ type UserIn struct {
 func Init(c *gin.Context) {
 	rows, err := db.Query("SELECT id, name, password FROM users")
 	if err != nil {
-		c.JSON(400, gin.H{
-			"ok":  false,
-			"msg": "数据处理错误",
-		})
+		c.JSON(200, gin.H{"ok": false, "msg": "数据处理错误"})
 	}
 	var users []User
 	for rows.Next() {
@@ -44,15 +41,9 @@ func Init(c *gin.Context) {
 		users = append(users, u)
 	}
 	if len(users) == 0 {
-		c.JSON(200, gin.H{
-			"ok":  true,
-			"msg": true,
-		})
+		c.JSON(200, gin.H{"ok": true, "msg": true})
 	} else {
-		c.JSON(200, gin.H{
-			"ok":  true,
-			"msg": false,
-		})
+		c.JSON(200, gin.H{"ok": true, "msg": false})
 	}
 }
 
@@ -75,7 +66,7 @@ func savePassword(password string, salt string) string {
 func Register(c *gin.Context) {
 	var newUser UserIn
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		c.JSON(400, gin.H{"ok": false, "data": "请求数据格式不正确"})
+		c.JSON(200, gin.H{"ok": false, "data": "请求数据格式不正确"})
 		return
 	}
 	query := `INSERT INTO users (name, password, salt) VALUES (?, ?, ?)`
@@ -115,12 +106,12 @@ func AuthCheck(username string, password string) bool {
 func Login(c *gin.Context) {
 	var user UserIn
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(400, gin.H{"ok": false, "data": "请求数据格式不正确"})
+		c.JSON(200, gin.H{"ok": false, "data": "请求数据格式不正确"})
 		return
 	}
 	if AuthCheck(user.Name, user.Password) {
 		c.JSON(200, gin.H{"ok": true, "msg": ""})
 	} else {
-		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+		c.JSON(200, gin.H{"ok": false, "msg": "身份验证失败"})
 	}
 }

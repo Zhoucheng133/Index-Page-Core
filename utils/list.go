@@ -21,21 +21,15 @@ func List(c *gin.Context) {
 	username := c.GetHeader("username")
 	password := c.GetHeader("password")
 	if len(username) == 0 || len(password) == 0 {
-		c.JSON(401, gin.H{"ok": false, "msg": "缺少请求头"})
+		c.JSON(200, gin.H{"ok": false, "msg": "缺少请求头"})
 		return
 	} else if !AuthCheck(username, password) {
-		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+		c.JSON(200, gin.H{"ok": false, "msg": "身份验证失败"})
 		return
 	}
 	rows, err := db.Query("SELECT id, name, port, webui, tip FROM pages")
 	if err != nil {
-		c.JSON(
-			400,
-			gin.H{
-				"ok":   false,
-				"data": err,
-			},
-		)
+		c.JSON(200, gin.H{"ok": false, "data": err})
 		return
 	}
 	var pages []Page
@@ -63,37 +57,25 @@ func List(c *gin.Context) {
 	}
 	defer rows.Close()
 	if err = rows.Err(); err != nil {
-		c.JSON(
-			400,
-			gin.H{
-				"ok":   false,
-				"data": err,
-			},
-		)
+		c.JSON(200, gin.H{"ok": false, "data": err})
 		return
 	}
-	c.JSON(
-		200,
-		gin.H{
-			"ok":   true,
-			"data": pages,
-		},
-	)
+	c.JSON(200, gin.H{"ok": true, "data": pages})
 }
 
 func AddItem(c *gin.Context) {
 	username := c.GetHeader("username")
 	password := c.GetHeader("password")
 	if len(username) == 0 || len(password) == 0 {
-		c.JSON(401, gin.H{"ok": false, "msg": "缺少请求头"})
+		c.JSON(200, gin.H{"ok": false, "msg": "缺少请求头"})
 		return
 	} else if !AuthCheck(username, password) {
-		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+		c.JSON(200, gin.H{"ok": false, "msg": "身份验证失败"})
 		return
 	}
 	var newPage Page
 	if err := c.ShouldBindJSON(&newPage); err != nil {
-		c.JSON(400, gin.H{"ok": false, "data": "请求数据格式不正确"})
+		c.JSON(200, gin.H{"ok": false, "data": "请求数据格式不正确"})
 		return
 	}
 	query := `INSERT INTO pages (name, port, webui, tip) VALUES (?, ?, ?, ?)`
@@ -109,16 +91,16 @@ func DeleteItem(c *gin.Context) {
 	username := c.GetHeader("username")
 	password := c.GetHeader("password")
 	if len(username) == 0 || len(password) == 0 {
-		c.JSON(401, gin.H{"ok": false, "msg": "缺少请求头"})
+		c.JSON(200, gin.H{"ok": false, "msg": "缺少请求头"})
 		return
 	} else if !AuthCheck(username, password) {
-		c.JSON(401, gin.H{"ok": false, "msg": "身份验证失败"})
+		c.JSON(200, gin.H{"ok": false, "msg": "身份验证失败"})
 		return
 	}
 	id := c.Param("id")
 
 	if id == "" {
-		c.JSON(400, gin.H{"ok": false, "data": "缺少 ID 参数"})
+		c.JSON(200, gin.H{"ok": false, "data": "缺少 ID 参数"})
 		return
 	}
 
