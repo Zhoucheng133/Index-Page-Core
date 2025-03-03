@@ -11,7 +11,11 @@ func main() {
 	utils.InitSql()
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.Use(cors.Default())
+
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = append(config.AllowHeaders, "username", "password")
+	r.Use(cors.New(config))
 
 	r.GET("/api/list", utils.List)
 	r.POST("/api/add", utils.AddItem)
