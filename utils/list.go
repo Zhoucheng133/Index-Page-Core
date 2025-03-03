@@ -18,7 +18,7 @@ type Page struct {
 }
 
 func List(c *gin.Context) {
-	username := c.GetHeader("username")
+	username := c.GetHeader("name")
 	password := c.GetHeader("password")
 	if len(username) == 0 || len(password) == 0 {
 		c.JSON(200, gin.H{"ok": false, "msg": "缺少请求头"})
@@ -64,7 +64,7 @@ func List(c *gin.Context) {
 }
 
 func AddItem(c *gin.Context) {
-	username := c.GetHeader("username")
+	username := c.GetHeader("name")
 	password := c.GetHeader("password")
 	if len(username) == 0 || len(password) == 0 {
 		c.JSON(200, gin.H{"ok": false, "msg": "缺少请求头"})
@@ -88,7 +88,7 @@ func AddItem(c *gin.Context) {
 }
 
 func DeleteItem(c *gin.Context) {
-	username := c.GetHeader("username")
+	username := c.GetHeader("name")
 	password := c.GetHeader("password")
 	if len(username) == 0 || len(password) == 0 {
 		c.JSON(200, gin.H{"ok": false, "msg": "缺少请求头"})
