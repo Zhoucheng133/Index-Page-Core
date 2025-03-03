@@ -14,7 +14,7 @@ func main() {
 
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
-	config.AllowHeaders = append(config.AllowHeaders, "username", "password")
+	config.AllowHeaders = append(config.AllowHeaders, "name", "password")
 	r.Use(cors.New(config))
 
 	r.GET("/api/list", utils.List)
