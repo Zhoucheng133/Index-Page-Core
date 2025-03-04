@@ -29,7 +29,7 @@ func List(c *gin.Context) {
 	}
 	rows, err := db.Query("SELECT id, name, port, webui, tip FROM pages")
 	if err != nil {
-		c.JSON(200, gin.H{"ok": false, "data": err})
+		c.JSON(200, gin.H{"ok": false, "msg": err})
 		return
 	}
 	var pages []Page
@@ -57,10 +57,10 @@ func List(c *gin.Context) {
 	}
 	defer rows.Close()
 	if err = rows.Err(); err != nil {
-		c.JSON(200, gin.H{"ok": false, "data": err})
+		c.JSON(200, gin.H{"ok": false, "msg": err})
 		return
 	}
-	c.JSON(200, gin.H{"ok": true, "data": pages})
+	c.JSON(200, gin.H{"ok": true, "msg": pages})
 }
 
 func AddItem(c *gin.Context) {
@@ -75,16 +75,16 @@ func AddItem(c *gin.Context) {
 	}
 	var newPage Page
 	if err := c.ShouldBindJSON(&newPage); err != nil {
-		c.JSON(200, gin.H{"ok": false, "data": "请求数据格式不正确"})
+		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
 	query := `INSERT INTO pages (name, port, webui, tip) VALUES (?, ?, ?, ?)`
 	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
 	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "data": "插入数据失败", "error": err.Error()})
+		c.JSON(500, gin.H{"ok": false, "msg": "插入数据失败", "error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"ok": true, "data": "数据插入成功"})
+	c.JSON(200, gin.H{"ok": true, "msg": "数据插入成功"})
 }
 
 func DeleteItem(c *gin.Context) {
@@ -100,15 +100,15 @@ func DeleteItem(c *gin.Context) {
 	id := c.Param("id")
 
 	if id == "" {
-		c.JSON(200, gin.H{"ok": false, "data": "缺少 ID 参数"})
+		c.JSON(200, gin.H{"ok": false, "msg": "缺少 ID 参数"})
 		return
 	}
 
 	query := `DELETE FROM pages WHERE id = ?`
 	_, err := db.Exec(query, id)
 	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "data": "删除数据失败", "error": err.Error()})
+		c.JSON(500, gin.H{"ok": false, "msg": "删除数据失败", "error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"ok": true, "data": "数据删除成功"})
+	c.JSON(200, gin.H{"ok": true, "msg": "数据删除成功"})
 }

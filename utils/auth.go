@@ -66,18 +66,18 @@ func savePassword(password string, salt string) string {
 func Register(c *gin.Context) {
 	var newUser UserIn
 	if err := c.ShouldBindJSON(&newUser); err != nil {
-		c.JSON(200, gin.H{"ok": false, "data": "请求数据格式不正确"})
+		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
 	query := `INSERT INTO users (name, password, salt) VALUES (?, ?, ?)`
 	salt := generateRandomString(6)
 	_, err := db.Exec(query, newUser.Name, savePassword(newUser.Password, salt), salt)
 	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "data": "注册失败", "error": err.Error()})
+		c.JSON(500, gin.H{"ok": false, "msg": "注册失败", "error": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"ok": true, "data": "注册成功"})
+	c.JSON(200, gin.H{"ok": true, "msg": "注册成功"})
 }
 
 func AuthCheck(username string, password string) bool {
@@ -106,7 +106,7 @@ func AuthCheck(username string, password string) bool {
 func Login(c *gin.Context) {
 	var user UserIn
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(200, gin.H{"ok": false, "data": "请求数据格式不正确"})
+		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
 	if AuthCheck(user.Name, user.Password) {
