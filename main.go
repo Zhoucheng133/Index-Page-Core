@@ -25,5 +25,8 @@ func main() {
 	r.POST("/api/register", utils.Register)
 	r.POST("/api/login", utils.Login)
 
+	r.GET("/api/ipv4", utils.GetIpv4)
+	r.GET("/api/ipv6", utils.GetIpv6)
+
 	r.Run(":8080")
 }
