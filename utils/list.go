@@ -112,3 +112,27 @@ func DeleteItem(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"ok": true, "msg": "数据删除成功"})
 }
+
+func EditItem(c *gin.Context) {
+	username := c.GetHeader("name")
+	password := c.GetHeader("password")
+	if len(username) == 0 || len(password) == 0 {
+		c.JSON(200, gin.H{"ok": false, "msg": "缺少请求头"})
+		return
+	} else if !AuthCheck(username, password) {
+		c.JSON(200, gin.H{"ok": false, "msg": "身份验证失败"})
+		return
+	}
+	var newPage Page
+	if err := c.ShouldBindJSON(&newPage); err != nil {
+		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
+		return
+	}
+	query:=`UPDATE pages SET name = ?, port = ?, web_ui = ?, tip = ? WHERE id = ?`
+	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip, newPage.ID)
+	if err != nil {
+		c.JSON(500, gin.H{"ok": false, "msg": "更新数据失败", "error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"ok": true, "msg": "更新数据成功"})
+}
