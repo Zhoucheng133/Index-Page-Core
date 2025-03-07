@@ -20,6 +20,7 @@ func main() {
 	r.GET("/api/list", utils.List)
 	r.POST("/api/add", utils.AddItem)
 	r.DELETE("/api/del/:id", utils.DeleteItem)
+	r.POST("/api/edit", utils.EditItem)
 
 	r.GET("/api/init", utils.Init)
 	r.POST("/api/register", utils.Register)
