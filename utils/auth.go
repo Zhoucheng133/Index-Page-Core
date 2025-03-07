@@ -35,7 +35,7 @@ func Init(c *gin.Context) {
 			&u.Name,
 			&u.Password,
 		); err != nil {
-			c.JSON(500, gin.H{"error": fmt.Sprint("数据处理错误", err)})
+			c.JSON(200, gin.H{"error": fmt.Sprint("数据处理错误", err)})
 			return
 		}
 		users = append(users, u)
@@ -73,7 +73,7 @@ func Register(c *gin.Context) {
 	salt := generateRandomString(6)
 	_, err := db.Exec(query, newUser.Name, savePassword(newUser.Password, salt), salt)
 	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "msg": "注册失败", "error": err.Error()})
+		c.JSON(200, gin.H{"ok": false, "msg": "注册失败", "error": err.Error()})
 		return
 	}
 

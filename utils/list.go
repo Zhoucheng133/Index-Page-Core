@@ -45,7 +45,7 @@ func List(c *gin.Context) {
 			&tip,
 		); err != nil {
 			log.Printf("数据解析失败: %v", err)
-			c.JSON(500, gin.H{"error": fmt.Sprint("数据处理错误", err)})
+			c.JSON(200, gin.H{"error": fmt.Sprint("数据处理错误", err)})
 			return
 		}
 		if tip.Valid {
@@ -81,7 +81,7 @@ func AddItem(c *gin.Context) {
 	query := `INSERT INTO pages (name, port, webui, tip) VALUES (?, ?, ?, ?)`
 	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
 	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "msg": "插入数据失败", "error": err.Error()})
+		c.JSON(200, gin.H{"ok": false, "msg": "插入数据失败", "error": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{"ok": true, "msg": "数据插入成功"})
@@ -107,7 +107,7 @@ func DeleteItem(c *gin.Context) {
 	query := `DELETE FROM pages WHERE id = ?`
 	_, err := db.Exec(query, id)
 	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "msg": "删除数据失败", "error": err.Error()})
+		c.JSON(200, gin.H{"ok": false, "msg": "删除数据失败", "error": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{"ok": true, "msg": "数据删除成功"})
@@ -128,10 +128,10 @@ func EditItem(c *gin.Context) {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
-	query:=`UPDATE pages SET name = ?, port = ?, web_ui = ?, tip = ? WHERE id = ?`
+	query := `UPDATE pages SET name = ?, port = ?, web_ui = ?, tip = ? WHERE id = ?`
 	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip, newPage.ID)
 	if err != nil {
-		c.JSON(500, gin.H{"ok": false, "msg": "更新数据失败", "error": err.Error()})
+		c.JSON(200, gin.H{"ok": false, "msg": "更新数据失败", "error": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{"ok": true, "msg": "更新数据成功"})
