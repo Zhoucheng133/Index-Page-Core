@@ -128,7 +128,7 @@ func EditItem(c *gin.Context) {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
-	query := `UPDATE pages SET name = ?, port = ?, web_ui = ?, tip = ? WHERE id = ?`
+	query := `UPDATE pages SET name = ?, port = ?, webui = ?, tip = ? WHERE id = ?`
 	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip, newPage.ID)
 	if err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "更新数据失败", "error": err.Error()})
