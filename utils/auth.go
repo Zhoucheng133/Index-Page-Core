@@ -15,15 +15,21 @@ import (
 var secretKey = []byte("index")
 
 type User struct {
-	ID       int    `json:"id,omitempty"`
+	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
 	Salt     string `json:"salt"`
 }
 
-type UserIn struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
+type UserRegister struct {
+	ID       string `json:"id"  binding:"required"`
+	Name     string `json:"name"  binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type UserLogin struct {
+	Name     string `json:"name"  binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 // 初始化判断是否有用户信息
@@ -72,14 +78,14 @@ func savePassword(password string, salt string) string {
 
 // 注册
 func Register(c *gin.Context) {
-	var newUser UserIn
-	if err := c.ShouldBindJSON(&newUser); err != nil {
+	var newUser UserRegister
+	if err := c.ShouldBind(&newUser); err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
-	query := `INSERT INTO users (name, password, salt) VALUES (?, ?, ?)`
+	query := `INSERT INTO users (id, name, password, salt) VALUES (?, ?, ?, ?)`
 	salt := generateRandomString(6)
-	_, err := db.Exec(query, newUser.Name, savePassword(newUser.Password, salt), salt)
+	_, err := db.Exec(query, newUser.ID, newUser.Name, savePassword(newUser.Password, salt), salt)
 	if err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "注册失败", "error": err.Error()})
 		return
@@ -160,7 +166,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 // 登录
 func Login(c *gin.Context) {
-	var user UserIn
+	var user UserLogin
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
