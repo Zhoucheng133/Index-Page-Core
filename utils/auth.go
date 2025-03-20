@@ -21,6 +21,30 @@ type User struct {
 	Salt     string `json:"salt"`
 }
 
+func userExist() bool {
+	rows, err := db.Query("SELECT id, name, password FROM users")
+	if err != nil {
+		return false
+	}
+	var users []User
+	for rows.Next() {
+		var u User
+		if err := rows.Scan(
+			&u.ID,
+			&u.Name,
+			&u.Password,
+		); err != nil {
+			return false
+		}
+		users = append(users, u)
+	}
+	if len(users) == 0 {
+		return false
+	} else {
+		return true
+	}
+}
+
 // 初始化判断是否有用户信息
 func Init(c *gin.Context) {
 	rows, err := db.Query("SELECT id, name, password FROM users")
@@ -55,6 +79,12 @@ func savePassword(password string, salt string) string {
 
 // 注册
 func Register(c *gin.Context) {
+
+	if userExist() {
+		c.JSON(200, gin.H{"ok": false, "msg": "用户已存在"})
+		return
+	}
+
 	var newUser User
 	if err := c.ShouldBind(&newUser); err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
