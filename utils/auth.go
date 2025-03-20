@@ -167,7 +167,6 @@ func Login(c *gin.Context) {
 	}
 	if LoginCheck(user.Name, user.Password) {
 		token, err := GenerateToken(user.Name)
-		fmt.Println(token)
 		if err != nil {
 			c.JSON(200, gin.H{"ok": false, "msg": err})
 		}
