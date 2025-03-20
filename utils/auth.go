@@ -4,32 +4,21 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"math/rand"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/jaevor/go-nanoid"
 )
 
 var secretKey = []byte("index")
 
 type User struct {
 	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	Name     string `json:"name" binding:"required"`
+	Password string `json:"password" binding:"required"`
 	Salt     string `json:"salt"`
-}
-
-type UserRegister struct {
-	ID       string `json:"id"  binding:"required"`
-	Name     string `json:"name"  binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-
-type UserLogin struct {
-	Name     string `json:"name"  binding:"required"`
-	Password string `json:"password" binding:"required"`
 }
 
 // 初始化判断是否有用户信息
@@ -58,18 +47,6 @@ func Init(c *gin.Context) {
 	}
 }
 
-// 生成salt
-func generateRandomString(length int) string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	var result []byte
-	for i := 0; i < length; i++ {
-		randomIndex := rng.Intn(len(charset))
-		result = append(result, charset[randomIndex])
-	}
-	return string(result)
-}
-
 // 保存密码
 func savePassword(password string, salt string) string {
 	hash := sha256.Sum256([]byte(password + salt))
@@ -78,14 +55,16 @@ func savePassword(password string, salt string) string {
 
 // 注册
 func Register(c *gin.Context) {
-	var newUser UserRegister
+	var newUser User
 	if err := c.ShouldBind(&newUser); err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
 	query := `INSERT INTO users (id, name, password, salt) VALUES (?, ?, ?, ?)`
-	salt := generateRandomString(6)
-	_, err := db.Exec(query, newUser.ID, newUser.Name, savePassword(newUser.Password, salt), salt)
+	id, _ := nanoid.Standard(21)
+	salt, _ := nanoid.Standard(10)
+	saltString := salt()
+	_, err := db.Exec(query, id(), newUser.Name, savePassword(newUser.Password, saltString), saltString)
 	if err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "注册失败", "error": err.Error()})
 		return
@@ -166,7 +145,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 // 登录
 func Login(c *gin.Context) {
-	var user UserLogin
+	var user User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
