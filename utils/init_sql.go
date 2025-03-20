@@ -17,7 +17,8 @@ func InitSql() {
 		return
 	}
 	createPage := `CREATE TABLE IF NOT EXISTS pages (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id TEXT PRIMARY KEY,
+		icon TEXT,
 		name TEXT,
 		port TEXT,
 		webui INTEGER,
@@ -28,7 +29,7 @@ func InitSql() {
 		log.Fatal(err)
 	}
 	createUser := `CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		id TEXT PRIMARY KEY,
 		name TEXT,
 		password TEXT,
 		salt TEXT
