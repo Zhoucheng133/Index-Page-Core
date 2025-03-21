@@ -51,7 +51,12 @@ func List(c *gin.Context) {
 		c.JSON(200, gin.H{"ok": false, "msg": err})
 		return
 	}
-	c.JSON(200, gin.H{"ok": true, "msg": pages})
+	if pages != nil {
+		c.JSON(200, gin.H{"ok": true, "msg": pages})
+	} else {
+		c.JSON(200, gin.H{"ok": true, "msg": []Page{}})
+	}
+
 }
 
 func AddItem(c *gin.Context) {
