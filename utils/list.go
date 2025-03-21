@@ -1,24 +1,25 @@
 package utils
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jaevor/go-nanoid"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type Page struct {
-	ID    int    `json:"id,omitempty"`
-	Name  string `json:"name"`
-	Port  string `json:"port"`
-	WebUI int    `json:"webui"`
-	Tip   string `json:"tip"`
+	ID    string `json:"id"`
+	ICON  string `json:"icon" binding:"omitempty"`
+	Name  string `json:"name" binding:"required"`
+	Port  string `json:"port" binding:"required"`
+	WebUI int    `json:"webui" binding:"omitempty"`
+	Tip   string `json:"tip" binding:"omitempty"`
 }
 
 func List(c *gin.Context) {
-	rows, err := db.Query("SELECT id, name, port, webui, tip FROM pages")
+	rows, err := db.Query("SELECT id, icon, name, port, webui, tip FROM pages")
 	if err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": err})
 		return
@@ -26,23 +27,17 @@ func List(c *gin.Context) {
 	var pages []Page
 	for rows.Next() {
 		var p Page
-		var tip sql.NullString
-		// 扫描顺序与SELECT字段顺序严格对应
 		if err := rows.Scan(
 			&p.ID,
+			&p.ICON,
 			&p.Name,
 			&p.Port,
 			&p.WebUI,
-			&tip,
+			&p.Tip,
 		); err != nil {
 			log.Printf("数据解析失败: %v", err)
 			c.JSON(200, gin.H{"error": fmt.Sprint("数据处理错误", err)})
 			return
-		}
-		if tip.Valid {
-			p.Tip = tip.String
-		} else {
-			p.Tip = ""
 		}
 		pages = append(pages, p)
 	}
@@ -62,16 +57,18 @@ func List(c *gin.Context) {
 func AddItem(c *gin.Context) {
 	var newPage Page
 	if err := c.ShouldBindJSON(&newPage); err != nil {
-		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
+		c.JSON(200, gin.H{"ok": false, "msg": fmt.Sprint("请求数据格式不正确", err)})
 		return
 	}
-	query := `INSERT INTO pages (name, port, webui, tip) VALUES (?, ?, ?, ?)`
-	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
+	id, _ := nanoid.Standard(21)
+	id_string := id()
+	query := `INSERT INTO pages (id, icon, name, port, webui, tip) VALUES (?, ?, ?, ?, ?, ?)`
+	_, err := db.Exec(query, id_string, newPage.ICON, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
 	if err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "插入数据失败", "error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"ok": true, "msg": "数据插入成功"})
+	c.JSON(200, gin.H{"ok": true, "msg": "数据插入成功", "id": id_string})
 }
 
 func DeleteItem(c *gin.Context) {
@@ -97,8 +94,8 @@ func EditItem(c *gin.Context) {
 		c.JSON(200, gin.H{"ok": false, "msg": "请求数据格式不正确"})
 		return
 	}
-	query := `UPDATE pages SET name = ?, port = ?, webui = ?, tip = ? WHERE id = ?`
-	_, err := db.Exec(query, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip, newPage.ID)
+	query := `UPDATE pages SET icon = ?, name = ?, port = ?, webui = ?, tip = ? WHERE id = ?`
+	_, err := db.Exec(query, newPage.ICON, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip, newPage.ID)
 	if err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "更新数据失败", "error": err.Error()})
 		return
