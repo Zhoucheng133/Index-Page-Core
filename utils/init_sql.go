@@ -21,7 +21,7 @@ func InitSql() {
 		icon TEXT,
 		name TEXT,
 		port TEXT,
-		webui INTEGER,
+		webui TEXT,
 		tip TEXT
 	);`
 	_, err = db.Exec(createPage)
