@@ -61,7 +61,7 @@ func AddItem(c *gin.Context) {
 
 	id, _ := nanoid.Standard(21)
 	idString := id()
-	query := `INSERT INTO pages (id, name, port, webui, tip) VALUES(?, ?, ?, ?, ?, ?)`
+	query := `INSERT INTO pages (id, name, port, webui, tip) VALUES(?, ?, ?, ?, ?)`
 	_, err := db.Exec(query, idString, newPage.Name, newPage.Port, newPage.WebUI, newPage.Tip)
 	if err != nil {
 		c.JSON(200, gin.H{"ok": false, "msg": "插入数据失败", "error": err.Error()})
