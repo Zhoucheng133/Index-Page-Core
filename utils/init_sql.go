@@ -18,7 +18,6 @@ func InitSql() {
 	}
 	createPage := `CREATE TABLE IF NOT EXISTS pages (
 		id TEXT PRIMARY KEY,
-		icon TEXT,
 		name TEXT,
 		port TEXT,
 		webui TEXT,
