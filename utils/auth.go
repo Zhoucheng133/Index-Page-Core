@@ -13,9 +13,10 @@ import (
 )
 
 // 生产模式下，使用nanoid生成secretKey
-// var keyId, _=nanoid.Standard(24)
-// var secretKey = []byte(keyId())
-var secretKey = []byte("index")
+var keyId, _ = nanoid.Standard(24)
+var secretKey = []byte(keyId())
+
+// var secretKey = []byte("index")
 
 type User struct {
 	ID       string `json:"id"`
